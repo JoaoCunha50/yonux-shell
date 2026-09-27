@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Game mode: strip the compositor's per-frame cost and switch to the
+# low-latency path. `stop` runs `hyprctl reload`, which rereads the Lua config
+# and drops every override made here, so there is nothing to remember.
+#
+#   game-mode [start | stop | toggle | status]   (status: exit 0 = on)
+#
+# The vibrance shader stays on on purpose.
+set -u
+
+state_file="${XDG_RUNTIME_DIR:-/tmp}/yonux-game-mode"
+
+notify() {
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send -a yonux "Game mode" "$1"
+  else
+    hyprctl notify 1 2500 0 "Game mode: $1" >/dev/null 2>&1
+  fi
+}
+
+start() {
+  # render_unfocused keeps a fullscreen game running while you look at
+  # another workspace; without frame callbacks its render loop (and netcode)
+  # would stall.
+  hyprctl eval '
+hl.config({
+  general = { allow_tearing = true },
+  decoration = {
+    active_opacity = 1.0,
+    inactive_opacity = 1.0,
+    blur = { enabled = false },
+    shadow = { enabled = false },
+  },
+  animations = { enabled = false },
+  misc = { vrr = 2 },
+})
+hl.window_rule({ name = "game-mode-immediate", match = { fullscreen = true }, immediate = true })
+hl.window_rule({ name = "game-mode-render-unfocused", match = { fullscreen = true }, render_unfocused = true })
+' >/dev/null
+  touch "$state_file"
+  notify "On: blur, shadows and animations off, tearing + VRR on"
+}
+
+stop() {
+  hyprctl reload >/dev/null
+  rm -f "$state_file"
+  notify "Off: desktop restored"
+}
+
+case "${1:-toggle}" in
+  status) [[ -f $state_file ]] ;;
+  start | on) start ;;
+  stop | off) stop ;;
+  toggle) if [[ -f $state_file ]]; then stop; else start; fi ;;
+  *)
+    echo "usage: game-mode [start | stop | toggle | status]" >&2
+    exit 1
+    ;;
+esac

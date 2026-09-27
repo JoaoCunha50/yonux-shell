@@ -1,0 +1,20 @@
+[config]
+
+[templates.hypr]
+input_path = "./templates/hypr-colors.lua"
+output_path = "~/.cache/yonux/hypr-colors.lua"
+post_hook = "command -v hyprctl >/dev/null && hyprctl eval \"dofile(os.getenv('HOME') .. '/.cache/yonux/hypr-colors.lua')\" >/dev/null"
+
+[templates.fish]
+input_path = "./templates/fish-colors.fish"
+output_path = "~/.config/fish/conf.d/zz-yonux-colors.fish"
+post_hook = "command -v fish >/dev/null && fish --no-config -c 'set -U __yonux_colors_rev (date +%s%N)'"
+
+[templates.hyprlock]
+input_path = "./templates/hyprlock-colors.conf"
+output_path = "~/.cache/yonux/hyprlock-colors.conf"
+
+[templates.ghostty]
+input_path = "./templates/ghostty-colors"
+output_path = "~/.config/ghostty/yonux-colors"
+post_hook = "pkill -USR2 -x ghostty || true"

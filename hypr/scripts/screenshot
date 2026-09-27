@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Screenshot to the clipboard and ~/Pictures/Screenshots.
+#
+#   screenshot [area | screen]   (screen: the focused monitor)
+set -euo pipefail
+
+dir="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+file="$dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+mkdir -p "$dir"
+
+case "${1:-area}" in
+  area)
+    # Escape in slurp cancels without an error
+    geometry=$(slurp) || exit 0
+    grim -g "$geometry" "$file"
+    ;;
+  screen)
+    output=$(hyprctl monitors | awk '/^Monitor/ { name = $2 } /focused: yes/ { print name }')
+    grim -o "$output" "$file"
+    ;;
+  *)
+    echo "usage: screenshot [area | screen]" >&2
+    exit 1
+    ;;
+esac
+
+wl-copy --type image/png < "$file"
+notify-send -a yonux -i "$file" "Screenshot" "Copied and saved to $file"
