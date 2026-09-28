@@ -9,6 +9,8 @@ hl.env("HYPRCURSOR_SIZE", "24")
 
 -- Prefer native Wayland, fall back to X11.
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
+-- nixpkgs wrappers (Spotify among them) only run native Wayland when this is set
+hl.env("NIXOS_OZONE_WL", "1")
 hl.env("GDK_BACKEND", "wayland,x11,*")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")

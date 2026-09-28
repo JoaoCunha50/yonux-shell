@@ -14,7 +14,6 @@
     nautilus
     hyprpicker
     hyprpolkitagent
-    hypridle
     bibata-cursors
     adw-gtk3
     matugen
@@ -25,7 +24,12 @@
   systemd.packages = [ pkgs.hyprpolkitagent ];
   services.gnome.gnome-keyring.enable = true;
 
-  # also sets up the hyprlock PAM service
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
+
+  services.hypridle.enable = true;
   programs.hyprlock.enable = true;
 
   hardware.bluetooth = {

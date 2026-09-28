@@ -23,7 +23,7 @@ void main() {
         rgb = pow(rgb, vec3(1.0 / GAMMA_SIDE));
         float luma = dot(rgb, EYE_SENSITIVITY);
         rgb = mix(vec3(luma), rgb, VIB_SIDE);
-        rgb *= BRIGHT_SIDE;
+        // rgb *= BRIGHT_SIDE;
     } else {
         float luma = dot(rgb, EYE_SENSITIVITY);
         rgb = mix(vec3(luma), rgb, VIB_MAIN);

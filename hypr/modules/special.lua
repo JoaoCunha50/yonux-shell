@@ -1,5 +1,4 @@
--- Special workspaces. The app ones launch their app on first toggle and are
--- where that app always opens.
+-- Special workspaces. The app ones launch their app on first toggle and are where that app always opens.
 local apps = {
     chat = { key = "SUPER + D", classes = { "vesktop", "discord" }, command = "vesktop" },
     music = { key = "SUPER + M", classes = { "Spotify", "spotify" }, command = "spotify" },
