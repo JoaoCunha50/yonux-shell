@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
 import qs.theme
+import qs.components
 
 RowLayout {
     id: battery
@@ -42,8 +43,8 @@ RowLayout {
         onLoaded: battery.status = statusFile.text().trim()
     }
 
-    Text {
-        text: {
+    ShellIcon {
+        icon: {
             if (battery.percentage < 0)
                 return "battery_1_bar";
             if (battery.status === "Charging")
@@ -61,8 +62,7 @@ RowLayout {
             return "battery_full";
         }
         color: battery.percentage >= 0 && battery.percentage <= 15 ? Theme.colors.danger : Theme.colors.fg
-        font.family: Icons.family
-        font.pixelSize: 18
+        size: 18
     }
 
     Text {

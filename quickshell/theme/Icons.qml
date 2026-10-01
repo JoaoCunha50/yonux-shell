@@ -20,4 +20,5 @@ QtObject {
     readonly property string mic: "mic"
     readonly property string micOff: "mic_off"
     readonly property string check: "check"
+    readonly property string apps: "apps"
 }

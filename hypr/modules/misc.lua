@@ -16,6 +16,9 @@ hl.config({
         force_zero_scaling = true,
         use_nearest_neighbor = true,
     },
+    render = {
+        direct_scanout = 1,
+    },
     dwindle = {
         preserve_split = true,
     },

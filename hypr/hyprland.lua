@@ -14,7 +14,6 @@ local function optional(mod)
 end
 
 require("modules.env")
-require("modules.gpu")
 require("modules.monitors")
 require("modules.input")
 require("modules.misc")

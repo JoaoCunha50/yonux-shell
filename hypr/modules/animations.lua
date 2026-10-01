@@ -1,5 +1,3 @@
--- Trimmed from Ryoku's default preset: a slight overshoot on open, quick
--- settles everywhere else.
 hl.config({ animations = { enabled = true } })
 
 hl.curve("easeOutQuint", { type = "bezier", points = { { 0.23, 1 }, { 0.32, 1 } } })

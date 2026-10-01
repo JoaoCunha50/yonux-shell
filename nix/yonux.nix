@@ -16,6 +16,7 @@
     hyprpolkitagent
     bibata-cursors
     adw-gtk3
+    adwaita-icon-theme
     matugen
     lm_sensors
     xdg-terminal-exec

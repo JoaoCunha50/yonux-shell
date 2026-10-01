@@ -41,12 +41,21 @@ PanelWindow {
             if (app.noDisplay)
                 return false;
 
-            let name = app.name?.toLowerCase();
-            let comment = app.comment?.toLowerCase();
-            let command = app.command?.join(" ").toLowerCase();
+            let name = app.name?.toLowerCase() ?? "";
+            let comment = app.comment?.toLowerCase() ?? "";
+            let command = app.command?.join(" ").toLowerCase() ?? "";
 
             return name.includes(query) || comment.includes(query) || command.includes(query);
         });
+    }
+
+    // Resolves absolute paths, theme names, or falls back to empty string
+    function iconSource(icon: string): string {
+        if (!icon)
+            return "";
+        if (icon.startsWith("/"))
+            return "file://" + icon;
+        return Quickshell.iconPath(icon, true) ?? "";
     }
 
     function toggleVisibility(): void {
@@ -154,7 +163,6 @@ PanelWindow {
                         height: 44
                         leftPadding: 10
                         rightPadding: 10
-
                         topPadding: 0
                         bottomPadding: 0
 
@@ -171,19 +179,20 @@ PanelWindow {
                                 Layout.alignment: Qt.AlignVCenter
 
                                 Image {
+                                    id: appIcon
                                     anchors.centerIn: parent
                                     width: 24
                                     height: 24
                                     fillMode: Image.PreserveAspectFit
-                                    source: modelData.icon ? `image://icon/${modelData.icon}` : ""
+                                    source: launcherWindow.iconSource(modelData.icon)
                                     asynchronous: true
 
-                                    Text {
+                                    // Graceful fallback when an icon is absent or not yet indexed by Qt
+                                    ShellIcon {
                                         anchors.centerIn: parent
-                                        visible: parent.status !== Image.Ready
-                                        text: "󰣆"
-                                        font.family: Theme.font.family
-                                        font.pixelSize: 16
+                                        visible: appIcon.status !== Image.Ready
+                                        icon: Icons.apps
+                                        size: 20
                                         color: Theme.colors.fg
                                     }
                                 }
