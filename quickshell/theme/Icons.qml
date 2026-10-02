@@ -13,6 +13,7 @@ QtObject {
     readonly property string memory: "memory"
     readonly property string cpu: "developer_board"
     readonly property string temperature: "device_thermostat"
+    readonly property string disk: "hard_drive"
     readonly property string wifi: "wifi"
     readonly property string volumeUp: "volume_up"
     readonly property string search: "search"
