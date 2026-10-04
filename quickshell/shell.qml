@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import qs.theme
 import qs.modules.bar
 import qs.modules.launcher
+import qs.modules.power
 import qs.modules.wallpaper
 import qs.services
 
@@ -52,6 +53,10 @@ ShellRoot {
 
     AppLauncher {
         id: launcher
+        targetScreen: root.focusedScreen
+    }
+
+    PowerMenu {
         targetScreen: root.focusedScreen
     }
 }

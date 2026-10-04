@@ -22,4 +22,13 @@ QtObject {
     readonly property string micOff: "mic_off"
     readonly property string check: "check"
     readonly property string apps: "apps"
+    readonly property string power: "power_settings_new"
+    readonly property string lock: "lock"
+    readonly property string sleep: "bedtime"
+    readonly property string logout: "logout"
+    readonly property string reboot: "restart_alt"
+    readonly property string chevronLeft: "chevron_left"
+    readonly property string chevronRight: "chevron_right"
+    readonly property string radioOn: "radio_button_checked"
+    readonly property string radioOff: "radio_button_unchecked"
 }

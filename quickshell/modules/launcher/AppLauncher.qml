@@ -29,6 +29,15 @@ PanelWindow {
     visible: false
 
     property string searchQuery: ""
+    onFilteredAppsChanged: navigation.reset()
+
+    onOpenChanged: {
+        if (open) {
+            navigation.reset();
+            visible = true;
+            searchField.forceActiveFocus();
+        }
+    }
 
     readonly property var filteredApps: {
         let query = searchQuery.trim().toLowerCase();
@@ -60,10 +69,6 @@ PanelWindow {
 
     function toggleVisibility(): void {
         launcherWindow.open = !launcherWindow.open;
-        if (launcherWindow.open) {
-            launcherWindow.visible = true;
-            searchField.forceActiveFocus();
-        }
     }
 
     function launch(entry: DesktopEntry): void {
@@ -79,6 +84,17 @@ PanelWindow {
         function toggle(): void {
             launcherWindow.toggleVisibility();
         }
+    }
+
+    KeyboardNavigation {
+        id: navigation
+        enabled: launcherWindow.open
+        count: launcherWindow.filteredApps.length
+        onActivated: index => {
+            launcherWindow.launch(launcherWindow.filteredApps[index]);
+            launcherWindow.open = false;
+        }
+        onCancelled: launcherWindow.open = false
     }
 
     MouseArea {
@@ -137,14 +153,7 @@ PanelWindow {
                     }
                     onTextChanged: launcherWindow.searchQuery = text
 
-                    Keys.onEscapePressed: launcherWindow.toggleVisibility()
-
-                    Keys.onReturnPressed: {
-                        if (launcherWindow.filteredApps.length > 0) {
-                            launcherWindow.launch(launcherWindow.filteredApps[0]);
-                            launcherWindow.toggleVisibility();
-                        }
-                    }
+                    Keys.forwardTo: [navigation]
                 }
 
                 ListView {
@@ -153,11 +162,19 @@ PanelWindow {
                     Layout.fillHeight: true
                     clip: true
                     model: launcherWindow.filteredApps
+                    currentIndex: navigation.currentIndex
+                    onCurrentIndexChanged: {
+                        if (currentIndex >= 0)
+                            positionViewAtIndex(currentIndex, ListView.Contain);
+                    }
                     spacing: 5
 
                     delegate: ItemDelegate {
                         id: delegateRoot
                         required property DesktopEntry modelData
+                        required property int index
+                        readonly property bool selected: index === navigation.currentIndex
+                        focusPolicy: Qt.NoFocus
 
                         width: ListView.view.width
                         height: 44
@@ -202,7 +219,7 @@ PanelWindow {
                                 text: modelData.name
                                 font.pixelSize: 14
                                 font.family: Theme.font.family
-                                color: delegateRoot.hovered ? Theme.colors.active : Theme.colors.fg
+                                color: delegateRoot.selected || delegateRoot.hovered ? Theme.colors.active : Theme.colors.fg
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                                 Layout.fillWidth: true
@@ -211,7 +228,7 @@ PanelWindow {
 
                         background: Rectangle {
                             radius: 8
-                            color: delegateRoot.hovered ? Theme.colors.controlHoverFill : "transparent"
+                            color: delegateRoot.selected || delegateRoot.hovered ? Theme.colors.controlHoverFill : "transparent"
                         }
 
                         onClicked: {

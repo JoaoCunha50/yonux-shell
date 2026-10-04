@@ -52,7 +52,7 @@ TrayPopup {
             spacing: 10
 
             UIText {
-                text: "Dispositivos de saída"
+                text: "Output devices"
                 font.bold: true
                 color: Theme.colors.active
             }
@@ -90,7 +90,7 @@ TrayPopup {
 
                             IconButton {
                                 icon: Icons.check
-                                tooltip: "Selecionar saída"
+                                tooltip: "Select output"
                                 active: sinkRow.selected
                                 enabled: !sinkRow.selected
                                 onClicked: audioPopup.selectDefault(sinkRow.modelData, true)
@@ -113,12 +113,12 @@ TrayPopup {
 
             UIText {
                 visible: audioPopup.audioNodes.length === 0
-                text: "Nenhuma saída disponível"
+                text: "No outputs available"
                 muted: true
             }
 
             UIText {
-                text: "Microfone"
+                text: "Microphone"
                 font.bold: true
                 color: Theme.colors.active
             }
@@ -156,14 +156,14 @@ TrayPopup {
 
                             IconButton {
                                 icon: sourceRow.modelData.audio && sourceRow.modelData.audio.muted ? Icons.micOff : Icons.mic
-                                tooltip: "Alternar microfone"
+                                tooltip: "Toggle microphone"
                                 enabled: !!sourceRow.modelData.audio
                                 onClicked: sourceRow.modelData.audio.muted = !sourceRow.modelData.audio.muted
                             }
 
                             IconButton {
                                 icon: Icons.check
-                                tooltip: "Selecionar microfone"
+                                tooltip: "Select microphone"
                                 active: sourceRow.selected
                                 enabled: !sourceRow.selected
                                 onClicked: audioPopup.selectDefault(sourceRow.modelData, false)
@@ -186,7 +186,7 @@ TrayPopup {
 
             UIText {
                 visible: audioPopup.audioNodes.length === 0
-                text: "Nenhum microfone disponível"
+                text: "No microphones available"
                 muted: true
             }
         }

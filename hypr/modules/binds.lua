@@ -12,6 +12,7 @@ hl.bind(mod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"), { description =
 hl.bind(mod .. "+ SHIFT + S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot area"), { description = "Screenshot an area" })
 hl.bind(mod .. "+ S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot screen"), { description = "Screenshot the focused monitor" })
 hl.bind(mod .. " + G", hl.dsp.exec_cmd(paths.hypr .. "/scripts/game-mode toggle"), { description = "Toggle game mode" })
+hl.bind(mod .. " + Escape", hl.dsp.exec_cmd(paths.qs .. " ipc call power toggle"), { description = "Toggle power menu" })
 hl.bind(mod .. " + SHIFT + Escape", hl.dsp.exit())
 
 -- Windows
@@ -19,7 +20,6 @@ hl.bind(mod .. " + Q", hl.dsp.window.close())
 hl.bind(mod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
 hl.bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(mod .. " + CTRL + F", hl.dsp.window.fullscreen_state({ internal = 0, client = 2, action = "toggle" }))
--- float at 1000x660, centred; press again to tile back
 hl.bind(mod .. " + A", function()
     hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
     hl.dispatch(hl.dsp.window.resize({ x = 1000, y = 660, exact = true }))

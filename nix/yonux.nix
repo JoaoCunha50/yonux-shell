@@ -24,6 +24,9 @@
 
   systemd.packages = [ pkgs.hyprpolkitagent ];
   services.gnome.gnome-keyring.enable = true;
+  services.gvfs.enable = true;
+  
+  services.udisks2.enable = true;
 
   programs.hyprland = {
     enable = true;
@@ -44,6 +47,13 @@
   services.upower.enable = true;
   services.power-profiles-daemon.enable = true;
 
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+
   programs.gamescope.enable = true;
   programs.gamemode.enable = true;
+
+  programs.steam.extraPackages = [ pkgs.bibata-cursors ];
 }

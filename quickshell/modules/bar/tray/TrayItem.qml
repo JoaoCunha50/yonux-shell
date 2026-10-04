@@ -14,6 +14,7 @@ Item {
     property string text: ""
     property int iconSize: 18
     property int textSize: 12
+    property int iconWeight: Font.Normal
 
     property bool alert: false
 
@@ -29,7 +30,7 @@ Item {
 
     readonly property bool hasLabel: icon !== "" || text !== ""
     readonly property bool popupOpen: _popup ? _popup.open : false
-    readonly property color contentColor: alert ? Theme.colors.danger : popupOpen ? Theme.colors.onActive : Theme.colors.fg
+    readonly property color contentColor: alert ? Theme.colors.fg : popupOpen ? Theme.colors.onActive : Theme.colors.fg
 
     signal clicked
 
@@ -104,6 +105,7 @@ Item {
             icon: root.icon
             iconColor: root.contentColor
             size: root.iconSize
+            iconWeight: root.iconWeight
         }
 
         UIText {

@@ -3,12 +3,15 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Services.SystemTray
 import qs.theme
 import qs.services
 import qs.components
 import qs.modules.bar.tray
 import qs.modules.bar.widgets
 import qs.modules.bar.popups
+import qs.modules.bar.systray
+import qs.modules.power
 
 Singleton {
     id: root
@@ -18,7 +21,7 @@ Singleton {
     readonly property var defaults: ({
             left: ["workspaces", "separator"],
             center: ["clock"],
-            right: ["audio", "cpu", "memory", "disk", "temperature", "battery"]
+            right: ["tray", "audio", "cpu", "memory", "disk", "temperature", "battery", "power"]
         })
 
     property var layout: defaults
@@ -29,6 +32,7 @@ Singleton {
 
     readonly property var items: ({
             workspaces: workspaces,
+            tray: tray,
             separator: separator,
             title: title,
             clock: clock,
@@ -37,7 +41,8 @@ Singleton {
             memory: memory,
             disk: disk,
             temperature: temperature,
-            battery: battery
+            battery: battery,
+            power: power
         })
 
     function resolve(ids: var): var {
@@ -89,6 +94,17 @@ Singleton {
         id: workspaces
         TrayItem {
             Workspaces {
+                anchors.fill: parent
+            }
+        }
+    }
+
+    Component {
+        id: tray
+        TrayItem {
+            shown: SystemTray.items.values.length > 0
+
+            SysTray {
                 anchors.fill: parent
             }
         }
@@ -157,7 +173,7 @@ Singleton {
             icon: Icons.cpu
             text: `${SystemStats.cpuPercent}%`
             alert: SystemStats.cpuPercent > 80
-            hoverText: `Carga média: ${SystemStats.loadAverage}`
+            hoverText: `Load average: ${SystemStats.loadAverage}`
         }
     }
 
@@ -167,7 +183,7 @@ Singleton {
             icon: Icons.memory
             text: `${SystemStats.memoryPercent}%`
             alert: SystemStats.memoryPercent > 85
-            hoverText: `${SystemStats.memoryUsedGiB.toFixed(1)} / ${SystemStats.memoryTotalGiB.toFixed(1)} GiB em uso`
+            hoverText: `${SystemStats.memoryUsedGiB.toFixed(1)} / ${SystemStats.memoryTotalGiB.toFixed(1)} GiB used`
         }
     }
 
@@ -177,7 +193,7 @@ Singleton {
             icon: Icons.disk
             text: `${SystemStats.diskPercent}%`
             alert: SystemStats.diskPercent > 90
-            hoverText: `${SystemStats.diskUsedGiB.toFixed(0)} / ${SystemStats.diskTotalGiB.toFixed(0)} GiB em uso em /`
+            hoverText: `${SystemStats.diskUsedGiB.toFixed(0)} / ${SystemStats.diskTotalGiB.toFixed(0)} GiB used on /`
         }
     }
 
@@ -215,11 +231,22 @@ Singleton {
                 return "battery_full";
             }
             hoverText: ({
-                    Charging: "A carregar",
-                    Discharging: "A descarregar",
-                    Full: "Carregada",
-                    "Not charging": "Ligada, sem carregar"
+                    Charging: "Charging",
+                    Discharging: "Discharging",
+                    Full: "Full",
+                    "Not charging": "Plugged in, not charging"
                 })[SystemStats.batteryStatus] ?? SystemStats.batteryStatus
+        }
+    }
+
+    Component {
+        id: power
+        TrayItem {
+            icon: Icons.power
+            iconWeight: 600
+            clickable: true
+            hoverText: "Power"
+            onClicked: Power.toggle()
         }
     }
 }

@@ -7,9 +7,12 @@ Text {
     property int size: 16
     property int iconWidth
     property int iconHeight
+    property int iconWeight: Font.Normal
 
     font.family: Icons.family
     font.pixelSize: size
+    font.weight: iconWeight
+    font.variableAxes: ({ "wght": iconWeight })
     text: icon
     color: iconColor
 
