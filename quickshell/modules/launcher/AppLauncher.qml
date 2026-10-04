@@ -208,9 +208,8 @@ PanelWindow {
                                     ShellIcon {
                                         anchors.centerIn: parent
                                         visible: appIcon.status !== Image.Ready
-                                        icon: Icons.apps
-                                        size: 20
-                                        color: Theme.colors.fg
+                                        icon.name: Icons.apps
+                                        icon.size: 20
                                     }
                                 }
                             }

@@ -4,9 +4,8 @@ import qs.theme
 Rectangle {
     id: root
 
-    property string icon: ""
-    property string iconFamily: Icons.family
-    property int iconSize: 18
+    property alias icon: iconItem.icon
+
     property bool active: false
     property bool checkable: false
     property string tooltip: ""
@@ -31,12 +30,11 @@ Rectangle {
         return "transparent";
     }
 
-    Text {
+    ShellIcon {
+        id: iconItem
         anchors.centerIn: parent
-        text: root.icon
-        color: root.enabled && root.active ? Theme.colors.onActive : Theme.colors.fg
-        font.family: root.iconFamily
-        font.pixelSize: root.iconSize
+        icon.size: 18
+        icon.color: root.enabled && root.active ? Theme.colors.onActive : Theme.colors.fg
     }
 
     MouseArea {

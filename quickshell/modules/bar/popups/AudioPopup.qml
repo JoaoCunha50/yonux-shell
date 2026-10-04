@@ -89,7 +89,7 @@ TrayPopup {
                             }
 
                             IconButton {
-                                icon: Icons.check
+                                icon.name: Icons.check
                                 tooltip: "Select output"
                                 active: sinkRow.selected
                                 enabled: !sinkRow.selected
@@ -155,14 +155,14 @@ TrayPopup {
                             }
 
                             IconButton {
-                                icon: sourceRow.modelData.audio && sourceRow.modelData.audio.muted ? Icons.micOff : Icons.mic
+                                icon.name: sourceRow.modelData.audio && sourceRow.modelData.audio.muted ? Icons.micOff : Icons.mic
                                 tooltip: "Toggle microphone"
                                 enabled: !!sourceRow.modelData.audio
                                 onClicked: sourceRow.modelData.audio.muted = !sourceRow.modelData.audio.muted
                             }
 
                             IconButton {
-                                icon: Icons.check
+                                icon.name: Icons.check
                                 tooltip: "Select microphone"
                                 active: sourceRow.selected
                                 enabled: !sourceRow.selected

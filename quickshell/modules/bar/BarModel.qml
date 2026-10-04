@@ -160,7 +160,7 @@ Singleton {
     Component {
         id: audio
         TrayItem {
-            icon: Icons.volumeUp
+            icon.name: Icons.volumeUp
             popup: Component {
                 AudioPopup {}
             }
@@ -170,7 +170,7 @@ Singleton {
     Component {
         id: cpu
         TrayItem {
-            icon: Icons.cpu
+            icon.name: Icons.cpu
             text: `${SystemStats.cpuPercent}%`
             alert: SystemStats.cpuPercent > 80
             hoverText: `Load average: ${SystemStats.loadAverage}`
@@ -180,7 +180,7 @@ Singleton {
     Component {
         id: memory
         TrayItem {
-            icon: Icons.memory
+            icon.name: Icons.memory
             text: `${SystemStats.memoryPercent}%`
             alert: SystemStats.memoryPercent > 85
             hoverText: `${SystemStats.memoryUsedGiB.toFixed(1)} / ${SystemStats.memoryTotalGiB.toFixed(1)} GiB used`
@@ -190,7 +190,7 @@ Singleton {
     Component {
         id: disk
         TrayItem {
-            icon: Icons.disk
+            icon.name: Icons.disk
             text: `${SystemStats.diskPercent}%`
             alert: SystemStats.diskPercent > 90
             hoverText: `${SystemStats.diskUsedGiB.toFixed(0)} / ${SystemStats.diskTotalGiB.toFixed(0)} GiB used on /`
@@ -200,7 +200,7 @@ Singleton {
     Component {
         id: temperature
         TrayItem {
-            icon: Icons.temperature
+            icon.name: Icons.temperature
             text: `${SystemStats.temperature}°C`
             alert: SystemStats.temperature > 80
         }
@@ -215,7 +215,7 @@ Singleton {
             shown: pct >= 0
             alert: pct >= 0 && pct <= 15
             text: `${pct}%`
-            icon: {
+            icon.name: {
                 if (charging)
                     return "battery_charging_full";
                 if (pct <= 10)
@@ -242,8 +242,8 @@ Singleton {
     Component {
         id: power
         TrayItem {
-            icon: Icons.power
-            iconWeight: 600
+            icon.name: Icons.power
+            icon.weight: 600
             clickable: true
             hoverText: "Power"
             onClicked: Power.toggle()

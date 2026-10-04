@@ -1,21 +1,18 @@
 import QtQuick
 import qs.theme
+import qs.components
 
 Text {
-    property string icon
-    property color iconColor: Theme.colors.fg
-    property int size: 16
-    property int iconWidth
-    property int iconHeight
-    property int iconWeight: Font.Normal
+    property IconProps icon: IconProps {
+        size: 18
+    }
 
     font.family: Icons.family
-    font.pixelSize: size
-    font.weight: iconWeight
-    font.variableAxes: ({ "wght": iconWeight })
-    text: icon
-    color: iconColor
-
-    width: iconWidth > 0 ? iconWidth : implicitWidth
-    height: iconHeight > 0 ? iconHeight : implicitHeight
+    font.pixelSize: icon.size
+    font.weight: icon.weight
+    font.variableAxes: ({
+            "wght": icon.weight
+        })
+    text: icon.name
+    color: icon.color
 }

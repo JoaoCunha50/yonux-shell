@@ -10,11 +10,9 @@ Item {
     property bool shown: true
     property bool fillWidth: false
 
-    property string icon: ""
+    property alias icon: iconItem.icon
     property string text: ""
-    property int iconSize: 18
     property int textSize: 12
-    property int iconWeight: Font.Normal
 
     property bool alert: false
 
@@ -28,7 +26,7 @@ Item {
 
     default property alias content: contentArea.data
 
-    readonly property bool hasLabel: icon !== "" || text !== ""
+    readonly property bool hasLabel: icon.name !== "" || text !== ""
     readonly property bool popupOpen: _popup ? _popup.open : false
     readonly property color contentColor: alert ? Theme.colors.fg : popupOpen ? Theme.colors.onActive : Theme.colors.fg
 
@@ -101,11 +99,10 @@ Item {
         spacing: 5
 
         ShellIcon {
-            visible: root.icon !== ""
-            icon: root.icon
-            iconColor: root.contentColor
-            size: root.iconSize
-            iconWeight: root.iconWeight
+            id: iconItem
+            visible: icon.name !== ""
+            icon.size: 18
+            icon.color: root.contentColor
         }
 
         UIText {

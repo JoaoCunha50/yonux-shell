@@ -54,8 +54,7 @@ TrayPopup {
             ShellIcon {
                 anchors.centerIn: parent
                 visible: row.image === ""
-                icon: row.icon
-                size: 16
+                icon.name: row.icon
             }
 
             IconImage {
@@ -81,8 +80,7 @@ TrayPopup {
             anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            icon: row.trailing
-            size: 16
+            icon.name: row.trailing
         }
 
         MouseArea {

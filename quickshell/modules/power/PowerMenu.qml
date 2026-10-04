@@ -217,9 +217,9 @@ PanelWindow {
 
                                 ShellIcon {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    icon: button.modelData.icon
-                                    size: 40
-                                    iconColor: button.isSelected ? Theme.colors.active : Theme.colors.fg
+                                    icon.name: button.modelData.icon
+                                    icon.size: 40
+                                    icon.color: button.isSelected ? Theme.colors.active : Theme.colors.fg
                                 }
 
                                 UIText {
