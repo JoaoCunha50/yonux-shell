@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.UPower
 
 Singleton {
     id: root
@@ -16,8 +17,10 @@ Singleton {
     property real diskTotalGiB: 0
     property int temperature: 0
 
-    property int batteryPercent: -1
-    property string batteryStatus: ""
+    readonly property UPowerDevice battery: UPower.displayDevice
+    readonly property bool hasBattery: battery?.isLaptopBattery ?? false
+    readonly property int batteryPercent: hasBattery ? Math.round(battery.percentage * 100) : -1
+    readonly property int batteryState: battery?.state ?? UPowerDeviceState.Unknown
 
     property var _lastCpuTimes: null
 
@@ -32,17 +35,6 @@ Singleton {
             memoryFile.reload();
             diskProcess.running = true;
             tempProcess.running = true;
-        }
-    }
-
-    Timer {
-        interval: 30000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: {
-            capacityFile.reload();
-            statusFile.reload();
         }
     }
 
@@ -134,24 +126,5 @@ Singleton {
                     root.temperature = Math.round(raw);
             }
         }
-    }
-
-    FileView {
-        id: capacityFile
-        path: "/sys/class/power_supply/BAT0/capacity"
-        printErrors: false
-
-        onLoaded: {
-            let value = parseInt(text().trim());
-            root.batteryPercent = isNaN(value) ? -1 : value;
-        }
-    }
-
-    FileView {
-        id: statusFile
-        path: "/sys/class/power_supply/BAT0/status"
-        printErrors: false
-
-        onLoaded: root.batteryStatus = text().trim()
     }
 }

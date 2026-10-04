@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
+import Quickshell.Services.UPower
 import qs.theme
 import qs.services
 import qs.components
@@ -210,7 +211,7 @@ Singleton {
         id: battery
         TrayItem {
             readonly property int pct: SystemStats.batteryPercent
-            readonly property bool charging: SystemStats.batteryStatus === "Charging"
+            readonly property bool charging: SystemStats.batteryState === UPowerDeviceState.Charging
 
             shown: pct >= 0
             alert: pct >= 0 && pct <= 15
@@ -230,12 +231,20 @@ Singleton {
                     return "battery_4_bar";
                 return "battery_full";
             }
-            hoverText: ({
-                    Charging: "Charging",
-                    Discharging: "Discharging",
-                    Full: "Full",
-                    "Not charging": "Plugged in, not charging"
-                })[SystemStats.batteryStatus] ?? SystemStats.batteryStatus
+            hoverText: {
+                switch (SystemStats.batteryState) {
+                case UPowerDeviceState.Charging:
+                    return "Charging";
+                case UPowerDeviceState.Discharging:
+                    return "Discharging";
+                case UPowerDeviceState.FullyCharged:
+                    return "Full";
+                case UPowerDeviceState.PendingCharge:
+                    return "Plugged in, not charging";
+                default:
+                    return "";
+                }
+            }
         }
     }
 
