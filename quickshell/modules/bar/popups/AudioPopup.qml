@@ -11,6 +11,8 @@ TrayPopup {
     id: audioPopup
 
     property var audioNodes: Pipewire.nodes.values
+    readonly property var outputs: audioNodes.filter(node => isOutput(node))
+    readonly property var inputs: audioNodes.filter(node => isInput(node))
 
     implicitWidth: 360
     implicitHeight: 480
@@ -58,17 +60,15 @@ TrayPopup {
             }
 
             Repeater {
-                model: audioPopup.audioNodes
+                model: audioPopup.outputs
 
                 delegate: Rectangle {
                     id: sinkRow
                     required property PwNode modelData
-                    readonly property bool eligible: audioPopup.isOutput(modelData)
                     readonly property bool selected: audioPopup.isDefault(modelData, true)
 
                     Layout.fillWidth: true
-                    implicitHeight: eligible ? 68 : 0
-                    visible: eligible
+                    implicitHeight: 68
                     color: Theme.colors.controlNormalFill
                     radius: Theme.control.radius
                     border.color: selected ? Theme.colors.active : "transparent"
@@ -112,7 +112,7 @@ TrayPopup {
             }
 
             UIText {
-                visible: audioPopup.audioNodes.length === 0
+                visible: audioPopup.outputs.length === 0
                 text: "No outputs available"
                 muted: true
             }
@@ -124,17 +124,15 @@ TrayPopup {
             }
 
             Repeater {
-                model: audioPopup.audioNodes
+                model: audioPopup.inputs
 
                 delegate: Rectangle {
                     id: sourceRow
                     required property PwNode modelData
-                    readonly property bool eligible: audioPopup.isInput(modelData)
                     readonly property bool selected: audioPopup.isDefault(modelData, false)
 
                     Layout.fillWidth: true
-                    implicitHeight: eligible ? 68 : 0
-                    visible: eligible
+                    implicitHeight: 68
                     color: Theme.colors.controlNormalFill
                     radius: Theme.control.radius
                     border.color: selected ? Theme.colors.active : "transparent"
@@ -185,7 +183,7 @@ TrayPopup {
             }
 
             UIText {
-                visible: audioPopup.audioNodes.length === 0
+                visible: audioPopup.inputs.length === 0
                 text: "No microphones available"
                 muted: true
             }

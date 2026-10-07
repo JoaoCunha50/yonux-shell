@@ -28,7 +28,7 @@ Item {
 
     readonly property bool hasLabel: icon.name !== "" || text !== ""
     readonly property bool popupOpen: _popup ? _popup.open : false
-    readonly property color contentColor: alert ? Theme.colors.fg : popupOpen ? Theme.colors.onActive : Theme.colors.fg
+    readonly property color contentColor: popupOpen ? Theme.colors.onActive : alert ? Theme.colors.alert : Theme.colors.fg
 
     signal clicked
 

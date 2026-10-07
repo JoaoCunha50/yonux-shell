@@ -36,6 +36,13 @@ Item {
     Process {
         id: matugenProc
 
+        onRunningChanged: {
+            if (!running && root._dirty) {
+                root._dirty = false;
+                root.generate();
+            }
+        }
+
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
