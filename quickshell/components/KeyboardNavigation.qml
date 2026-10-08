@@ -15,12 +15,10 @@ Item {
     readonly property list<int> previousKeys: [Qt.Key_Backtab, orientation === Qt.Vertical ? Qt.Key_Up : Qt.Key_Left]
     readonly property list<int> nextKeys: [Qt.Key_Tab, orientation === Qt.Vertical ? Qt.Key_Down : Qt.Key_Right]
     readonly property list<int> activationKeys: spaceActivates ? [Qt.Key_Return, Qt.Key_Enter, Qt.Key_Space] : [Qt.Key_Return, Qt.Key_Enter]
-    readonly property list<int> cancelKeys: [Qt.Key_Escape]
 
     signal activated(int index)
     signal activationPressed(int index)
     signal activationReleased
-    signal cancelled
 
     function reset(): void {
         currentIndex = count > 0 ? 0 : -1;
@@ -63,10 +61,6 @@ Item {
                 activationPressed(currentIndex);
                 activated(currentIndex);
             }
-        } else if (cancelKeys.includes(key)) {
-            event.accepted = true;
-            if (!event.isAutoRepeat)
-                cancelled();
         }
     }
 

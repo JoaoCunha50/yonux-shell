@@ -1,35 +1,23 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
-import Quickshell.Services.UPower
 import qs.theme
 import qs.services
 import qs.components
+import qs.modules.bar
 import qs.modules.bar.tray
+import qs.modules.bar.items
 import qs.modules.bar.widgets
-import qs.modules.bar.popups
 import qs.modules.bar.systray
-import qs.modules.power
 
 Singleton {
     id: root
 
-    readonly property string configPath: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/yonux/bar.json"
-
-    readonly property var defaults: ({
-            left: ["workspaces", "separator"],
-            center: ["clock"],
-            right: ["tray", "audio", "cpu", "memory", "disk", "temperature", "battery", "power"]
-        })
-
-    property var layout: defaults
-
-    readonly property list<Component> left: resolve(layout.left)
-    readonly property list<Component> center: resolve(layout.center)
-    readonly property list<Component> right: resolve(layout.right)
+    readonly property list<Component> left: resolve(BarLayout.left)
+    readonly property list<Component> center: resolve(BarLayout.center)
+    readonly property list<Component> right: resolve(BarLayout.right)
 
     readonly property var items: ({
             workspaces: workspaces,
@@ -50,45 +38,9 @@ Singleton {
         return ids.filter(id => {
             if (items[id])
                 return true;
-            console.warn(`bar.json: unknown item "${id}"`);
+            Alerts.error("bar.json has an unknown item", id);
             return false;
         }).map(id => items[id]);
-    }
-
-    function apply(json: string): void {
-        let parsed;
-        try {
-            parsed = JSON.parse(json);
-        } catch (e) {
-            console.warn(`bar.json: ${e}`);
-            return;
-        }
-
-        let next = {};
-        for (let section of ["left", "center", "right"])
-            next[section] = Array.isArray(parsed?.[section]) ? parsed[section] : defaults[section];
-        layout = next;
-    }
-
-    FileView {
-        id: configFile
-        path: root.configPath
-        watchChanges: true
-        printErrors: false
-
-        onFileChanged: reload()
-        onLoaded: root.apply(text())
-        onLoadFailed: error => {
-            if (error === FileViewError.FileNotFound)
-                createConfig.running = true;
-        }
-    }
-
-    // Seed the user file with the defaults so there is something to edit
-    Process {
-        id: createConfig
-        command: ["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && printf '%s\\n' \"$2\" > \"$1\"", "sh", root.configPath, JSON.stringify(root.defaults, null, 2)]
-        onExited: configFile.reload()
     }
 
     Component {
@@ -141,31 +93,12 @@ Singleton {
 
     Component {
         id: clock
-        TrayItem {
-            id: clockIcon
-            property date now: new Date()
-
-            text: Qt.formatDateTime(now, "ddd, dd MMM  hh:mm:ss")
-            textSize: Theme.font.bodySize
-            hoverText: Qt.formatDate(now, "dddd, d MMMM yyyy")
-
-            Timer {
-                interval: 1000
-                running: true
-                repeat: true
-                onTriggered: clockIcon.now = new Date()
-            }
-        }
+        ClockItem {}
     }
 
     Component {
         id: audio
-        TrayItem {
-            icon.name: Icons.volumeUp
-            popup: Component {
-                AudioPopup {}
-            }
-        }
+        AudioItem {}
     }
 
     Component {
@@ -209,43 +142,7 @@ Singleton {
 
     Component {
         id: battery
-        TrayItem {
-            readonly property int pct: SystemStats.batteryPercent
-            readonly property bool charging: SystemStats.batteryState === UPowerDeviceState.Charging
-
-            shown: pct >= 0
-            alert: pct >= 0 && pct <= 15
-            text: `${pct}%`
-            icon.name: {
-                if (charging)
-                    return "battery_charging_full";
-                if (pct <= 10)
-                    return "battery_alert";
-                if (pct <= 20)
-                    return "battery_1_bar";
-                if (pct <= 40)
-                    return "battery_2_bar";
-                if (pct <= 60)
-                    return "battery_3_bar";
-                if (pct <= 80)
-                    return "battery_4_bar";
-                return "battery_full";
-            }
-            hoverText: {
-                switch (SystemStats.batteryState) {
-                case UPowerDeviceState.Charging:
-                    return "Charging";
-                case UPowerDeviceState.Discharging:
-                    return "Discharging";
-                case UPowerDeviceState.FullyCharged:
-                    return "Full";
-                case UPowerDeviceState.PendingCharge:
-                    return "Plugged in, not charging";
-                default:
-                    return "";
-                }
-            }
-        }
+        BatteryItem {}
     }
 
     Component {
@@ -255,7 +152,7 @@ Singleton {
             icon.weight: 600
             clickable: true
             hoverText: "Power"
-            onClicked: Power.toggle()
+            onClicked: OverlayManager.toggle("power")
         }
     }
 }

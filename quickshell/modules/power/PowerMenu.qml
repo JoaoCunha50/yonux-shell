@@ -1,46 +1,26 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
 import qs.theme
 import qs.components
 import qs.modules.power
 
-PanelWindow {
+Overlay {
     id: root
 
-    property var targetScreen
+    name: "power"
+    dim: true
+
     property alias selected: navigation.currentIndex
     property int holding: -1
     property real progress: 0
     readonly property int holdDuration: 1000
-    readonly property bool open: Power.open
 
-    screen: targetScreen
-
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-    exclusiveZone: 0
-
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
+    onOpened: {
+        navigation.reset();
+        navigation.forceActiveFocus();
     }
-
-    color: "transparent"
-    visible: false
-
-    onOpenChanged: {
-        if (open) {
-            navigation.reset();
-            visible = true;
-            navigation.forceActiveFocus();
-        } else {
-            reset();
-        }
-    }
+    onOpenChanged: if (!open)
+        reset()
 
     function press(index: int): void {
         selected = index;
@@ -66,7 +46,12 @@ PanelWindow {
     function trigger(index: int): void {
         let action = Power.actions[index];
         if (!action.confirm)
-            Power.run(action);
+            run(action);
+    }
+
+    function run(action: var): void {
+        OverlayManager.close();
+        Power.run(action);
     }
 
     function reset(): void {
@@ -84,7 +69,7 @@ PanelWindow {
         onFinished: {
             let action = Power.actions[root.holding];
             root.reset();
-            Power.run(action);
+            root.run(action);
         }
     }
 
@@ -99,17 +84,6 @@ PanelWindow {
         onFinished: root.holding = -1
     }
 
-    Rectangle {
-        anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, 0.5)
-        opacity: reveal.opacity
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: Power.close()
-    }
-
     KeyboardNavigation {
         id: navigation
         enabled: root.open
@@ -121,134 +95,107 @@ PanelWindow {
         onActivationPressed: index => root.press(index)
         onActivated: index => root.trigger(index)
         onActivationReleased: root.release()
-        onCancelled: {
+
+        Keys.onEscapePressed: event => {
             if (charge.running)
                 root.release();
             else
-                Power.close();
+                event.accepted = false;
         }
     }
 
-    Reveal {
-        id: reveal
-        anchors.centerIn: parent
-        width: surface.width
-        height: surface.height
-        shown: root.open
-        onActiveChanged: if (!active)
-            root.visible = false
+    Column {
+        spacing: Theme.spacing.lg
 
-        Rectangle {
-            id: surface
-            width: content.implicitWidth + 44
-            height: content.implicitHeight + 44
+        Row {
+            spacing: Theme.spacing.md
 
-            color: Theme.colors.surface
-            radius: 12
-            border.color: Theme.colors.border
-            border.width: 1
+            Repeater {
+                model: Power.actions
 
-            MouseArea {
-                anchors.fill: parent
-                preventStealing: true
-            }
+                delegate: Rectangle {
+                    id: button
+                    required property var modelData
+                    required property int index
+                    readonly property bool isHolding: root.holding === index
+                    readonly property bool isSelected: root.selected === index
 
-            Column {
-                id: content
-                anchors.centerIn: parent
-                spacing: Theme.spacing.lg
+                    width: 120
+                    height: 120
+                    radius: 10
+                    color: Theme.colors.controlNormalFill
 
-                Row {
-                    spacing: Theme.spacing.md
+                    Item {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        height: button.height * (button.isHolding ? root.progress : 0)
+                        clip: true
 
-                    Repeater {
-                        model: Power.actions
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            height: button.height
+                            radius: button.radius
+                            color: Qt.rgba(Theme.colors.active.r, Theme.colors.active.g, Theme.colors.active.b, 0.35)
+                        }
+                    }
 
-                        delegate: Rectangle {
-                            id: button
-                            required property var modelData
-                            required property int index
-                            readonly property bool isHolding: root.holding === index
-                            readonly property bool isSelected: root.selected === index
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: button.radius
+                        color: "transparent"
+                        border.width: 2
+                        border.color: {
+                            if (button.isHolding || button.isSelected)
+                                return Theme.colors.active;
+                            return "transparent";
+                        }
 
-                            width: 120
-                            height: 120
-                            radius: 10
-                            color: Theme.colors.controlNormalFill
-
-                            Item {
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                height: button.height * (button.isHolding ? root.progress : 0)
-                                clip: true
-
-                                Rectangle {
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.bottom: parent.bottom
-                                    height: button.height
-                                    radius: button.radius
-                                    color: Qt.rgba(Theme.colors.active.r, Theme.colors.active.g, Theme.colors.active.b, 0.35)
-                                }
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: button.radius
-                                color: "transparent"
-                                border.width: 2
-                                border.color: {
-                                    if (button.isHolding || button.isSelected)
-                                        return Theme.colors.active;
-                                    return "transparent";
-                                }
-
-                                Behavior on border.color {
-                                    ColorAnimation {
-                                        duration: Motion.small
-                                    }
-                                }
-                            }
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacing.sm
-
-                                ShellIcon {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    icon.name: button.modelData.icon
-                                    icon.size: 40
-                                    icon.color: button.isSelected ? Theme.colors.active : Theme.colors.fg
-                                }
-
-                                UIText {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    text: button.modelData.label
-                                }
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onEntered: if (!charge.running)
-                                    root.selected = button.index
-                                onPressed: root.press(button.index)
-                                onReleased: root.release()
-                                onCanceled: root.release()
-                                onClicked: root.trigger(button.index)
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: Motion.small
                             }
                         }
                     }
-                }
 
-                UIText {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    muted: true
-                    text: Power.actions[root.selected].confirm ? `Hold to ${Power.actions[root.selected].label.toLowerCase()}` : "← → to choose · Enter to confirm"
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: Theme.spacing.sm
+
+                        ShellIcon {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            icon.name: button.modelData.icon
+                            icon.size: 40
+                            icon.color: button.isSelected ? Theme.colors.active : Theme.colors.fg
+                        }
+
+                        UIText {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: button.modelData.label
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: if (!charge.running)
+                            root.selected = button.index
+                        onPressed: root.press(button.index)
+                        onReleased: root.release()
+                        onCanceled: root.release()
+                        onClicked: root.trigger(button.index)
+                    }
                 }
             }
+        }
+
+        UIText {
+            anchors.horizontalCenter: parent.horizontalCenter
+            muted: true
+            text: Power.actions[root.selected]?.confirm ? `Hold to ${Power.actions[root.selected].label.toLowerCase()}` : "← → to choose · Enter to confirm"
         }
     }
 }

@@ -1,18 +1,12 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
-import Quickshell
+import qs.services
 
 QtObject {
     id: root
 
-    property var palette: null
-
-    component ConfigTokens: QtObject {
-        readonly property string wallpaperStateFile: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/current_wallpaper"
-    }
-
-    readonly property ConfigTokens config: ConfigTokens {}
+    readonly property var palette: Matugen.colors
 
     component FontTokens: QtObject {
         readonly property string family: "JetBrainsMono Nerd Font"
@@ -62,4 +56,11 @@ QtObject {
     }
 
     readonly property ControlTokens control: ControlTokens {}
+
+    component OverlayTokens: QtObject {
+        readonly property int radius: 12
+        readonly property int padding: 22
+    }
+
+    readonly property OverlayTokens overlay: OverlayTokens {}
 }

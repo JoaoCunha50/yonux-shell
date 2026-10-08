@@ -16,6 +16,8 @@ QtObject {
     readonly property string disk: "hard_drive"
     readonly property string wifi: "wifi"
     readonly property string volumeUp: "volume_up"
+    readonly property string volumeDown: "volume_down"
+    readonly property string volumeOff: "volume_off"
     readonly property string search: "search"
     readonly property string close: "close"
     readonly property string mic: "mic"

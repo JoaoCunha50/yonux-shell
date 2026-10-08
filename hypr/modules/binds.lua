@@ -5,14 +5,14 @@ local mod = "SUPER"
 hl.bind(mod .. " + Return", hl.dsp.exec_cmd("ghostty"))
 hl.bind(mod .. " + B", hl.dsp.exec_cmd("flatpak run app.zen_browser.zen"))
 hl.bind(mod .. " + E", hl.dsp.exec_cmd("nautilus"))
-hl.bind(mod .. " + Space", hl.dsp.exec_cmd(paths.qs .. " ipc call launcher toggle"), { description = "Toggle application launcher" })
+hl.bind(mod .. " + Space", hl.dsp.global("yonux:launcher"), { description = "Toggle application launcher" })
 hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a"))
 hl.bind(mod .. " + V", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"), { description = "Clipboard history" })
 hl.bind(mod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"), { description = "Lock the session" })
 hl.bind(mod .. "+ SHIFT + S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot area"), { description = "Screenshot an area" })
 hl.bind(mod .. "+ S", hl.dsp.exec_cmd(paths.hypr .. "/scripts/screenshot screen"), { description = "Screenshot the focused monitor" })
 hl.bind(mod .. " + G", hl.dsp.exec_cmd(paths.hypr .. "/scripts/game-mode toggle"), { description = "Toggle game mode" })
-hl.bind(mod .. " + Escape", hl.dsp.exec_cmd(paths.qs .. " ipc call power toggle"), { description = "Toggle power menu" })
+hl.bind(mod .. " + Escape", hl.dsp.global("yonux:power"), { description = "Toggle power menu" })
 hl.bind(mod .. " + SHIFT + Escape", hl.dsp.exit())
 
 -- Windows

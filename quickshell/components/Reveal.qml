@@ -5,8 +5,8 @@ Item {
     id: root
 
     property bool shown: false
-    property real hiddenScale: 0.94
-    property real hiddenOffset: -8
+    property real hiddenScale: Motion.revealScale
+    property real hiddenOffset: Motion.revealOffset
     readonly property bool active: shown || opacity > 0
 
     opacity: 0

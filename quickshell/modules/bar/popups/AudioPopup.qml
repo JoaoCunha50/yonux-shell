@@ -4,42 +4,73 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell.Services.Pipewire
 import qs.theme
+import qs.services
 import qs.components
 import qs.modules.bar.tray
 
 TrayPopup {
     id: audioPopup
 
-    property var audioNodes: Pipewire.nodes.values
-    readonly property var outputs: audioNodes.filter(node => isOutput(node))
-    readonly property var inputs: audioNodes.filter(node => isInput(node))
-
     implicitWidth: 360
     implicitHeight: 480
     grabFocus: true
 
     PwObjectTracker {
-        objects: audioPopup.audioNodes
+        objects: Audio.outputs.concat(Audio.inputs)
     }
 
-    function isOutput(node) {
-        return node && node.audio && node.isSink && !node.isStream;
-    }
+    component DeviceRow: Rectangle {
+        id: row
 
-    function isInput(node) {
-        return node && node.audio && !node.isSink && !node.isStream;
-    }
+        required property PwNode modelData
+        readonly property bool selected: Audio.isDefault(modelData)
+        readonly property bool muted: modelData.audio?.muted ?? false
 
-    function isDefault(node, output) {
-        let current = output ? Pipewire.defaultAudioSink : Pipewire.defaultAudioSource;
-        return current && node && current.id === node.id;
-    }
+        Layout.fillWidth: true
+        implicitHeight: 68
+        color: Theme.colors.controlNormalFill
+        radius: Theme.control.radius
+        border.color: selected ? Theme.colors.active : "transparent"
+        border.width: 1
 
-    function selectDefault(node, output) {
-        if (output)
-            Pipewire.preferredDefaultAudioSink = node;
-        else
-            Pipewire.preferredDefaultAudioSource = node;
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 4
+
+            RowLayout {
+                Layout.fillWidth: true
+
+                UIText {
+                    Layout.fillWidth: true
+                    text: row.modelData.description || row.modelData.name
+                    elide: Text.ElideRight
+                }
+
+                IconButton {
+                    icon.name: row.modelData.isSink ? (row.muted ? Icons.volumeOff : Icons.volumeUp) : (row.muted ? Icons.micOff : Icons.mic)
+                    tooltip: row.modelData.isSink ? "Toggle output" : "Toggle microphone"
+                    enabled: !!row.modelData.audio
+                    onClicked: Audio.toggleMute(row.modelData)
+                }
+
+                IconButton {
+                    icon.name: Icons.check
+                    tooltip: row.modelData.isSink ? "Select output" : "Select microphone"
+                    active: row.selected
+                    enabled: !row.selected
+                    onClicked: Audio.select(row.modelData)
+                }
+            }
+
+            Slider {
+                Layout.fillWidth: true
+                from: 0.0
+                to: 1.0
+                value: row.modelData.audio?.volume ?? 0
+                onMoved: Audio.setVolume(row.modelData, value)
+            }
+        }
     }
 
     Flickable {
@@ -60,59 +91,12 @@ TrayPopup {
             }
 
             Repeater {
-                model: audioPopup.outputs
-
-                delegate: Rectangle {
-                    id: sinkRow
-                    required property PwNode modelData
-                    readonly property bool selected: audioPopup.isDefault(modelData, true)
-
-                    Layout.fillWidth: true
-                    implicitHeight: 68
-                    color: Theme.colors.controlNormalFill
-                    radius: Theme.control.radius
-                    border.color: selected ? Theme.colors.active : "transparent"
-                    border.width: 1
-
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 4
-
-                        RowLayout {
-                            Layout.fillWidth: true
-
-                            UIText {
-                                Layout.fillWidth: true
-                                text: sinkRow.modelData.description || sinkRow.modelData.name
-                                elide: Text.ElideRight
-                            }
-
-                            IconButton {
-                                icon.name: Icons.check
-                                tooltip: "Select output"
-                                active: sinkRow.selected
-                                enabled: !sinkRow.selected
-                                onClicked: audioPopup.selectDefault(sinkRow.modelData, true)
-                            }
-                        }
-
-                        Slider {
-                            Layout.fillWidth: true
-                            from: 0.0
-                            to: 1.0
-                            value: sinkRow.modelData.audio ? sinkRow.modelData.audio.volume : 0
-                            onMoved: {
-                                if (sinkRow.modelData.audio)
-                                    sinkRow.modelData.audio.volume = value;
-                            }
-                        }
-                    }
-                }
+                model: Audio.outputs
+                delegate: DeviceRow {}
             }
 
             UIText {
-                visible: audioPopup.outputs.length === 0
+                visible: Audio.outputs.length === 0
                 text: "No outputs available"
                 muted: true
             }
@@ -124,66 +108,12 @@ TrayPopup {
             }
 
             Repeater {
-                model: audioPopup.inputs
-
-                delegate: Rectangle {
-                    id: sourceRow
-                    required property PwNode modelData
-                    readonly property bool selected: audioPopup.isDefault(modelData, false)
-
-                    Layout.fillWidth: true
-                    implicitHeight: 68
-                    color: Theme.colors.controlNormalFill
-                    radius: Theme.control.radius
-                    border.color: selected ? Theme.colors.active : "transparent"
-                    border.width: 1
-
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 4
-
-                        RowLayout {
-                            Layout.fillWidth: true
-
-                            UIText {
-                                Layout.fillWidth: true
-                                text: sourceRow.modelData.description || sourceRow.modelData.name
-                                elide: Text.ElideRight
-                            }
-
-                            IconButton {
-                                icon.name: sourceRow.modelData.audio && sourceRow.modelData.audio.muted ? Icons.micOff : Icons.mic
-                                tooltip: "Toggle microphone"
-                                enabled: !!sourceRow.modelData.audio
-                                onClicked: sourceRow.modelData.audio.muted = !sourceRow.modelData.audio.muted
-                            }
-
-                            IconButton {
-                                icon.name: Icons.check
-                                tooltip: "Select microphone"
-                                active: sourceRow.selected
-                                enabled: !sourceRow.selected
-                                onClicked: audioPopup.selectDefault(sourceRow.modelData, false)
-                            }
-                        }
-
-                        Slider {
-                            Layout.fillWidth: true
-                            from: 0.0
-                            to: 1.0
-                            value: sourceRow.modelData.audio ? sourceRow.modelData.audio.volume : 0
-                            onMoved: {
-                                if (sourceRow.modelData.audio)
-                                    sourceRow.modelData.audio.volume = value;
-                            }
-                        }
-                    }
-                }
+                model: Audio.inputs
+                delegate: DeviceRow {}
             }
 
             UIText {
-                visible: audioPopup.inputs.length === 0
+                visible: Audio.inputs.length === 0
                 text: "No microphones available"
                 muted: true
             }

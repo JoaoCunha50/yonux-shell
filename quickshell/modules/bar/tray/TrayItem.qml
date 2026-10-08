@@ -16,18 +16,15 @@ Item {
 
     property bool alert: false
 
-    property Component popup: null
-    property Component hover: null
-    property TrayPopup _popup: null
-    property TrayHover _hover: null
-
-    property string hoverText: ""
+    property alias popup: anchor.popup
+    property alias hover: anchor.hover
+    property alias hoverText: anchor.hoverText
     property bool clickable: popup !== null
 
     default property alias content: contentArea.data
 
     readonly property bool hasLabel: icon.name !== "" || text !== ""
-    readonly property bool popupOpen: _popup ? _popup.open : false
+    readonly property alias popupOpen: anchor.popupOpen
     readonly property color contentColor: popupOpen ? Theme.colors.onActive : alert ? Theme.colors.alert : Theme.colors.fg
 
     signal clicked
@@ -35,46 +32,9 @@ Item {
     implicitWidth: hasLabel ? row.implicitWidth + (clickable ? 12 : 0) : contentArea.children.length > 0 ? contentArea.children[0].implicitWidth : 0
     implicitHeight: hasLabel ? 30 : contentArea.children.length > 0 ? contentArea.children[0].implicitHeight : 0
 
-    function togglePopup(): void {
-        if (!_popup)
-            _popup = popup.createObject(root, {
-                anchorItem: root
-            });
-        hideHover();
-        _popup.open = !_popup.open;
-    }
-
-    function showHover(): void {
-        if (popupOpen)
-            return;
-        if (!_hover) {
-            let component = hover ?? (hoverText !== "" ? defaultHover : null);
-            if (!component)
-                return;
-            _hover = component.createObject(root, {
-                anchorItem: root
-            });
-        }
-        _hover.open = true;
-    }
-
-    function hideHover(): void {
-        hoverTimer.stop();
-        if (_hover)
-            _hover.open = false;
-    }
-
-    Component {
-        id: defaultHover
-        TrayHover {
-            text: root.hoverText
-        }
-    }
-
-    Timer {
-        id: hoverTimer
-        interval: 400
-        onTriggered: root.showHover()
+    PopupAnchor {
+        id: anchor
+        hovered: hoverHandler.hovered
     }
 
     Rectangle {
@@ -121,7 +81,6 @@ Item {
     HoverHandler {
         id: hoverHandler
         cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
-        onHoveredChanged: hovered ? hoverTimer.restart() : root.hideHover()
     }
 
     TapHandler {
@@ -129,8 +88,7 @@ Item {
         enabled: root.clickable
         onTapped: {
             root.clicked();
-            if (root.popup)
-                root.togglePopup();
+            anchor.togglePopup();
         }
     }
 }

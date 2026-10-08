@@ -10,16 +10,12 @@ Rectangle {
 
     required property SystemTrayItem modelData
 
-    property TrayMenu _menu: null
-    property TrayHover _hover: null
-    readonly property bool menuOpen: _menu ? _menu.open : false
-
     implicitWidth: 26
     implicitHeight: 26
     radius: width / 1.5
 
     color: {
-        if (menuOpen)
+        if (anchor.popupOpen)
             return Theme.colors.controlNormalFill;
         if (mouseArea.pressed)
             return Theme.colors.controlPressedFill;
@@ -28,50 +24,18 @@ Rectangle {
         return "transparent";
     }
 
-    function toggleMenu(): void {
-        if (!modelData.hasMenu)
-            return;
-        if (!_menu)
-            _menu = menuComponent.createObject(root, {
-                anchorItem: root,
-                handle: modelData.menu
-            });
-        hideHover();
-        _menu.open = !_menu.open;
-    }
-
-    function showHover(): void {
-        if (menuOpen)
-            return;
-        if (!_hover)
-            _hover = hoverComponent.createObject(root, {
-                anchorItem: root
-            });
-        _hover.open = true;
-    }
-
-    function hideHover(): void {
-        hoverTimer.stop();
-        if (_hover)
-            _hover.open = false;
+    PopupAnchor {
+        id: anchor
+        hovered: mouseArea.containsMouse
+        hoverText: root.modelData.tooltipTitle || root.modelData.title || root.modelData.id
+        popup: root.modelData.hasMenu ? menuComponent : null
     }
 
     Component {
         id: menuComponent
-        TrayMenu {}
-    }
-
-    Component {
-        id: hoverComponent
-        TrayHover {
-            text: root.modelData.tooltipTitle || root.modelData.title || root.modelData.id
+        TrayMenu {
+            handle: root.modelData.menu // qmllint disable unresolved-type
         }
-    }
-
-    Timer {
-        id: hoverTimer
-        interval: 400
-        onTriggered: root.showHover()
     }
 
     IconImage {
@@ -87,13 +51,11 @@ Rectangle {
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         cursorShape: Qt.PointingHandCursor
 
-        onContainsMouseChanged: containsMouse ? hoverTimer.restart() : root.hideHover()
-
         onClicked: mouse => {
             if (mouse.button === Qt.MiddleButton)
                 root.modelData.secondaryActivate();
             else if (mouse.button === Qt.LeftButton || root.modelData.onlyMenu)
-                root.toggleMenu();
+                anchor.togglePopup();
             else
                 root.modelData.activate();
         }

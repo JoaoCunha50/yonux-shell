@@ -1,13 +1,10 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.theme
 
 Singleton {
     id: root
-
-    property bool open: false
 
     readonly property var actions: [
         {
@@ -42,23 +39,7 @@ Singleton {
         }
     ]
 
-    function toggle(): void {
-        open = !open;
-    }
-
-    function close(): void {
-        open = false;
-    }
-
     function run(action: var): void {
-        open = false;
         Quickshell.execDetached(action.command);
-    }
-
-    IpcHandler {
-        target: "power"
-        function toggle(): void {
-            root.toggle();
-        }
     }
 }
