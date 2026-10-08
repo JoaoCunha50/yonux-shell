@@ -8,7 +8,6 @@ import qs.services
 import qs.components
 import qs.modules.bar
 import qs.modules.bar.tray
-import qs.modules.bar.items
 import qs.modules.bar.widgets
 import qs.modules.bar.systray
 
@@ -45,11 +44,7 @@ Singleton {
 
     Component {
         id: workspaces
-        TrayItem {
-            Workspaces {
-                anchors.fill: parent
-            }
-        }
+        WorkspacesWidget {}
     }
 
     Component {
@@ -57,17 +52,14 @@ Singleton {
         TrayItem {
             shown: SystemTray.items.values.length > 0
 
-            SysTray {
-                anchors.fill: parent
-            }
+            contentItem: SysTray {}
         }
     }
 
     Component {
         id: separator
         TrayItem {
-            Rectangle {
-                anchors.fill: parent
+            contentItem: Rectangle {
                 implicitWidth: 2
                 implicitHeight: 18
                 color: Theme.colors.active
@@ -80,8 +72,7 @@ Singleton {
         TrayItem {
             fillWidth: true
 
-            UIText {
-                anchors.fill: parent
+            contentItem: UIText {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 padding: 5
@@ -93,12 +84,12 @@ Singleton {
 
     Component {
         id: clock
-        ClockItem {}
+        ClockWidget {}
     }
 
     Component {
         id: audio
-        AudioItem {}
+        AudioWidget {}
     }
 
     Component {
@@ -142,7 +133,7 @@ Singleton {
 
     Component {
         id: battery
-        BatteryItem {}
+        BatteryWidget {}
     }
 
     Component {

@@ -21,7 +21,7 @@ Item {
     property alias hoverText: anchor.hoverText
     property bool clickable: popup !== null
 
-    default property alias content: contentArea.data
+    property Item contentItem: null
 
     readonly property bool hasLabel: icon.name !== "" || text !== ""
     readonly property alias popupOpen: anchor.popupOpen
@@ -29,8 +29,15 @@ Item {
 
     signal clicked
 
-    implicitWidth: hasLabel ? row.implicitWidth + (clickable ? 12 : 0) : contentArea.children.length > 0 ? contentArea.children[0].implicitWidth : 0
-    implicitHeight: hasLabel ? 30 : contentArea.children.length > 0 ? contentArea.children[0].implicitHeight : 0
+    implicitWidth: hasLabel ? row.implicitWidth + (clickable ? 12 : 0) : contentItem?.implicitWidth ?? 0
+    implicitHeight: hasLabel ? 30 : contentItem?.implicitHeight ?? 0
+
+    onContentItemChanged: {
+        if (!contentItem)
+            return;
+        contentItem.parent = root;
+        contentItem.anchors.fill = root;
+    }
 
     PopupAnchor {
         id: anchor
@@ -71,11 +78,6 @@ Item {
             color: root.contentColor
             font.pixelSize: root.textSize
         }
-    }
-
-    Item {
-        id: contentArea
-        anchors.fill: parent
     }
 
     HoverHandler {
