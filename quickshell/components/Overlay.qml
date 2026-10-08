@@ -82,7 +82,7 @@ PanelWindow {
             height: body.childrenRect.height + root.padding * 2
 
             color: Theme.colors.surface
-            radius: Theme.overlay.radius
+            radius: Theme.radius.xl
             border.color: Theme.colors.border
             border.width: 1
 

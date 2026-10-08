@@ -15,12 +15,11 @@ Rectangle {
     radius: width / 1.5
 
     color: {
-        if (anchor.popupOpen)
-            return Theme.colors.controlNormalFill;
+        let c = Theme.colors.active;
         if (mouseArea.pressed)
-            return Theme.colors.controlPressedFill;
-        if (mouseArea.containsMouse)
-            return Theme.colors.controlNormalFill;
+            return Qt.rgba(c.r, c.g, c.b, 0.35);
+        if (anchor.popupOpen || mouseArea.containsMouse)
+            return Qt.rgba(c.r, c.g, c.b, 0.25);
         return "transparent";
     }
 

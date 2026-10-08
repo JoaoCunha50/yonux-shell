@@ -40,7 +40,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         visible: root.clickable
-        radius: Theme.control.radius
+        radius: Theme.radius.sm
         color: {
             if (root.popupOpen)
                 return Theme.colors.active;

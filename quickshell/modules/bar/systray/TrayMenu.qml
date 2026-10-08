@@ -38,7 +38,7 @@ TrayPopup {
 
         width: parent.width
         height: 30
-        radius: Theme.control.radius
+        radius: Theme.radius.sm
         color: interactive && area.containsMouse ? Theme.colors.controlHoverFill : "transparent"
         opacity: interactive ? 1 : 0.5
 

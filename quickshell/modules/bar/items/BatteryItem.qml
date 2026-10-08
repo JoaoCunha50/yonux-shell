@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Services.UPower
+import qs.theme
 import qs.services
 import qs.modules.bar.tray
 
@@ -12,18 +13,18 @@ TrayItem {
     text: `${pct}%`
     icon.name: {
         if (charging)
-            return "battery_charging_full";
+            return Icons.batteryCharging;
         if (pct <= 10)
-            return "battery_alert";
+            return Icons.batteryAlert;
         if (pct <= 20)
-            return "battery_1_bar";
+            return Icons.battery1;
         if (pct <= 40)
-            return "battery_2_bar";
+            return Icons.battery2;
         if (pct <= 60)
-            return "battery_3_bar";
+            return Icons.battery3;
         if (pct <= 80)
-            return "battery_4_bar";
-        return "battery_full";
+            return Icons.battery4;
+        return Icons.batteryFull;
     }
     hoverText: {
         switch (SystemStats.batteryState) {

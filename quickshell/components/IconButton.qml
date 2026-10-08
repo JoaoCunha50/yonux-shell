@@ -7,7 +7,6 @@ Rectangle {
     property alias icon: iconItem.icon
 
     property bool active: false
-    property bool checkable: false
     property string tooltip: ""
 
     readonly property bool hovered: mouseArea.containsMouse
@@ -17,7 +16,7 @@ Rectangle {
 
     implicitWidth: 30
     implicitHeight: 30
-    radius: Theme.control.radius
+    radius: Theme.radius.sm
     color: {
         if (!root.enabled)
             return Theme.colors.controlDisabledFill;
@@ -43,10 +42,6 @@ Rectangle {
         enabled: root.enabled
         hoverEnabled: true
         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-        onClicked: {
-            if (root.checkable)
-                root.active = !root.active;
-            root.clicked();
-        }
+        onClicked: root.clicked()
     }
 }

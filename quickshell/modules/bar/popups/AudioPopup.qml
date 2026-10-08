@@ -29,7 +29,7 @@ TrayPopup {
         Layout.fillWidth: true
         implicitHeight: 68
         color: Theme.colors.controlNormalFill
-        radius: Theme.control.radius
+        radius: Theme.radius.sm
         border.color: selected ? Theme.colors.active : "transparent"
         border.width: 1
 

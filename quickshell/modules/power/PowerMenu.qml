@@ -122,7 +122,7 @@ Overlay {
 
                     width: 120
                     height: 120
-                    radius: 10
+                    radius: Theme.radius.lg
                     color: Theme.colors.controlNormalFill
 
                     Item {

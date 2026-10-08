@@ -33,4 +33,11 @@ QtObject {
     readonly property string chevronRight: "chevron_right"
     readonly property string radioOn: "radio_button_checked"
     readonly property string radioOff: "radio_button_unchecked"
+    readonly property string batteryCharging: "battery_charging_full"
+    readonly property string batteryAlert: "battery_alert"
+    readonly property string battery1: "battery_1_bar"
+    readonly property string battery2: "battery_2_bar"
+    readonly property string battery3: "battery_3_bar"
+    readonly property string battery4: "battery_4_bar"
+    readonly property string batteryFull: "battery_full"
 }

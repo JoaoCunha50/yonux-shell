@@ -23,7 +23,6 @@ QtObject {
         readonly property color fgMuted: root.palette?.on_surface_variant?.dark?.color ?? "#a6adc8"
         readonly property color onActive: root.palette?.on_primary?.dark?.color ?? "#11111b"
         readonly property color alert: root.palette?.error?.dark?.color ?? "#f38ba8"
-        readonly property color inactive: root.palette?.surface_container_high?.dark?.color ?? "#45475a"
         readonly property color surface: root.palette?.surface_container?.dark?.color ?? "#181825"
         readonly property color field: root.palette?.surface_container_highest?.dark?.color ?? "#313244"
         readonly property color border: root.palette?.outline_variant?.dark?.color ?? "#313244"
@@ -44,21 +43,22 @@ QtObject {
 
     readonly property SpacingTokens spacing: SpacingTokens {}
 
+    component RadiusTokens: QtObject {
+        readonly property int sm: 6
+        readonly property int md: 8
+        readonly property int lg: 10
+        readonly property int xl: 12
+    }
+
+    readonly property RadiusTokens radius: RadiusTokens {}
+
     component BarTokens: QtObject {
         readonly property int height: 40
-        readonly property int radius: 8
     }
 
     readonly property BarTokens bar: BarTokens {}
 
-    component ControlTokens: QtObject {
-        readonly property int radius: 6
-    }
-
-    readonly property ControlTokens control: ControlTokens {}
-
     component OverlayTokens: QtObject {
-        readonly property int radius: 12
         readonly property int padding: 22
     }
 

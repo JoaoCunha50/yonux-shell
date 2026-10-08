@@ -78,7 +78,7 @@ Overlay {
             leftPadding: 16
             rightPadding: 16
             background: Rectangle {
-                radius: 8
+                radius: Theme.radius.md
                 color: Theme.colors.field
                 border.color: searchField.activeFocus ? Theme.colors.active : Theme.colors.border
                 border.width: 1
@@ -159,7 +159,7 @@ Overlay {
                 }
 
                 background: Rectangle {
-                    radius: 8
+                    radius: Theme.radius.md
                     color: delegateRoot.selected || delegateRoot.hovered ? Theme.colors.controlHoverFill : "transparent"
                 }
 

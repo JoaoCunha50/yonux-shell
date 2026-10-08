@@ -8,7 +8,7 @@ Rectangle {
     implicitWidth: row.implicitWidth + 2 * Theme.spacing.sm
     implicitHeight: 30
     radius: height / 1.5
-    color: Theme.colors.controlHoverFill
+    color: Qt.rgba(Theme.colors.active.r, Theme.colors.active.g, Theme.colors.active.b, 0.18)
     clip: true
 
     Behavior on implicitWidth {
