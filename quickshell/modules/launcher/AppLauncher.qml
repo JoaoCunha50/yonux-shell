@@ -25,16 +25,27 @@ Overlay {
         if (entries.length === 0)
             return [];
 
-        return entries.filter(app => {
-            if (app.noDisplay)
-                return false;
+        return entries.filter(app => !app.noDisplay).map(app => ({
+                    app,
+                    rank: matchRank(app, query)
+                })).filter(match => match.rank >= 0).sort((a, b) => a.rank - b.rank || a.app.name.localeCompare(b.app.name)).map(match => match.app);
+    }
 
-            let name = app.name?.toLowerCase() ?? "";
-            let comment = app.comment?.toLowerCase() ?? "";
-            let command = app.command?.join(" ").toLowerCase() ?? "";
+    // Lower is better; -1 means no match
+    function matchRank(app: DesktopEntry, query: string): int {
+        if (query === "")
+            return 0;
 
-            return name.includes(query) || comment.includes(query) || command.includes(query);
-        });
+        let name = app.name?.toLowerCase() ?? "";
+        if (name.startsWith(query))
+            return 0;
+        if (name.split(/[\s\-_.]+/).some(word => word.startsWith(query)))
+            return 1;
+        if (name.includes(query))
+            return 2;
+
+        let extra = [app.genericName, app.comment, ...(app.keywords ?? []), ...(app.command ?? [])].join(" ").toLowerCase();
+        return extra.includes(query) ? 3 : -1;
     }
 
     // Resolves absolute paths, theme names, or falls back to empty string
@@ -75,13 +86,28 @@ Overlay {
             font.pixelSize: 16
             color: Theme.colors.fg
             placeholderTextColor: Theme.colors.fgMuted
-            leftPadding: 16
+            leftPadding: 48
             rightPadding: 16
             background: Rectangle {
                 radius: Theme.radius.md
                 color: Theme.colors.field
                 border.color: searchField.activeFocus ? Theme.colors.active : Theme.colors.border
                 border.width: 1
+            }
+
+            ShellIcon {
+                anchors.left: parent.left
+                anchors.leftMargin: 16
+                anchors.verticalCenter: parent.verticalCenter
+                icon.name: Icons.search
+                icon.size: 20
+                icon.color: searchField.activeFocus ? Theme.colors.active : Theme.colors.fgMuted
+
+                Behavior on icon.color {
+                    ColorAnimation {
+                        duration: Motion.small
+                    }
+                }
             }
 
             Keys.forwardTo: [navigation]
