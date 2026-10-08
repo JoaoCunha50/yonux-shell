@@ -25,6 +25,7 @@ Singleton {
             title: title,
             clock: clock,
             audio: audio,
+            network: network,
             cpu: cpu,
             memory: memory,
             disk: disk,
@@ -90,6 +91,11 @@ Singleton {
     Component {
         id: audio
         AudioWidget {}
+    }
+
+    Component {
+        id: network
+        NetworkWidget {}
     }
 
     Component {

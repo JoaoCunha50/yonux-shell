@@ -12,7 +12,7 @@ Singleton {
     readonly property var defaults: ({
             left: ["workspaces", "separator"],
             center: ["clock"],
-            right: ["tray", "cpu", "memory", "disk", "temperature", "battery", "audio", "power"]
+            right: ["tray", "cpu", "memory", "disk", "temperature", "battery", "network", "audio", "power"]
         })
 
     property var layout: defaults
