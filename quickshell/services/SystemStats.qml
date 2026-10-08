@@ -15,7 +15,7 @@ Singleton {
     property int diskPercent: 0
     property real diskUsedGiB: 0
     property real diskTotalGiB: 0
-    property int temperature: 0
+    property int temperature: -1
 
     readonly property UPowerDevice battery: UPower.displayDevice
     readonly property bool hasBattery: battery?.isLaptopBattery ?? false
@@ -23,6 +23,7 @@ Singleton {
     readonly property int batteryState: battery?.state ?? UPowerDeviceState.Unknown
 
     property var _lastCpuTimes: null
+    property string _temperaturePath: ""
 
     Timer {
         interval: 5000
@@ -34,7 +35,8 @@ Singleton {
             loadFile.reload();
             memoryFile.reload();
             diskProcess.running = true;
-            tempProcess.running = true;
+            if (root._temperaturePath !== "")
+                temperatureFile.reload();
         }
     }
 
@@ -115,16 +117,38 @@ Singleton {
         }
     }
 
+    // Picks the CPU sensor once, preferring Package id 0 / Tdie over Tctl (same order as libsensors-based shells)
     Process {
-        id: tempProcess
-        command: ["sh", "-c", "sensors | awk -F'[:+°]' ' " + "  /Tccd[0-9]/        { val = int($3); found = 1; exit } " + "  /Tdie/             { val = int($3); found = 1; exit } " + "  /Package id [0-9]/ { val = int($3); found = 1; exit } " + "  /Core 0/           { val = int($3); found = 1; exit } " + "  /(CPU Temp|CPU)/   { val = int($3); found = 1; exit } " + "  /Tctl/             { if (!fallback) fallback = int($3) } " + "  END { " + "    if (found) print val; " + "    else if (fallback) print fallback; " + "  }'"]
+        running: true
+        command: ["sh", "-c", `
+            best=""; fallback=""; first=""
+            for h in /sys/class/hwmon/hwmon*; do
+                case "$(cat "$h/name" 2>/dev/null)" in coretemp|k10temp|zenpower) ;; *) continue ;; esac
+                [ -z "$first" ] && [ -r "$h/temp1_input" ] && first="$h/temp1_input"
+                for l in "$h"/temp*_label; do
+                    [ -r "$l" ] || continue
+                    case "$(cat "$l")" in
+                        "Package id 0"|Tdie) [ -z "$best" ] && best="\${l%_label}_input" ;;
+                        Tctl) [ -z "$fallback" ] && fallback="\${l%_label}_input" ;;
+                    esac
+                done
+            done
+            echo "\${best:-\${fallback:-$first}}"
+        `]
 
-        stdout: SplitParser {
-            onRead: data => {
-                let raw = parseFloat(data.trim());
-                if (!isNaN(raw) && raw > 0)
-                    root.temperature = Math.round(raw);
-            }
+        stdout: StdioCollector {
+            onStreamFinished: root._temperaturePath = this.text.trim()
+        }
+    }
+
+    FileView {
+        id: temperatureFile
+        path: root._temperaturePath
+
+        onLoaded: {
+            let milli = parseInt(text(), 10);
+            if (!isNaN(milli))
+                root.temperature = Math.round(milli / 1000);
         }
     }
 }
