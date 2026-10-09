@@ -30,6 +30,7 @@ hl.config({
     inactive_opacity = 1.0,
     blur = { enabled = false },
     shadow = { enabled = false },
+    rounding = 0,
   },
   animations = { enabled = false },
   misc = { vrr = 2 },

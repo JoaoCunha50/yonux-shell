@@ -6,7 +6,7 @@ import Quickshell.Wayland
 import qs.theme
 import qs.components
 
-PanelWindow {
+PanelWindow { // qmllint disable uncreatable-type
     id: root
 
     required property string name
@@ -42,7 +42,7 @@ PanelWindow {
         opened();
     }
 
-    GlobalShortcut {
+    GlobalShortcut { // qmllint disable unresolved-type
         appid: "yonux"
         name: root.name
         onPressed: OverlayManager.toggle(root.name)
